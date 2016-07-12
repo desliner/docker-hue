@@ -4,7 +4,7 @@ MAINTAINER Max Myslyvtsev <desliner@github>
 
 RUN apt-get update -y \
   && apt-get install --fix-missing -y \
-    git \
+    wget \
     supervisor \
     ant \
     gcc \
@@ -25,17 +25,20 @@ RUN apt-get update -y \
     python-dev \
     python-setuptools \
     libgmp3-dev \
+    libz-dev \
+    rsync \
   && rm -rf /var/lib/apt/lists/* \
   && apt-get clean
 
-ENV HUE_VERSION 3.9.0
+ENV HUE_VERSION 3.10.0
 
-RUN mkdir -p /source \
+RUN wget --no-check-certificate https://github.com/cloudera/hue/tarball/release-$HUE_VERSION -O /source.tgz \
+  && mkdir -p /source \
+  && tar xpvf /source.tgz -C /source --strip=1 \
+  && rm /source.tgz \
   && cd /source \
-  && git clone https://github.com/cloudera/hue.git \
-  && cd hue \
-  && git checkout release-$HUE_VERSION \
   && make install \
+  && cd / \
   && rm -rf /source \
   && rm -rf /root/.m2
 
